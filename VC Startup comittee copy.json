@@ -1,0 +1,780 @@
+{
+  "name": "VC Startup comittee copy",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "50671c63-90ec-4559-a7af-ccd82b595667",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        2720
+      ],
+      "webhookId": "5103475b-1c01-4da1-ad36-890139a84ed6",
+      "credentials": {
+        "telegramApi": {
+          "id": "BwQQkWdRYzwTPlKm",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.voice }}",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7b0463a7-2a31-46b9-ace7-5fe448c138b9",
+      "name": "Check Message Type",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -416,
+        2720
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "id": "cc6502c0-e950-47ee-8a51-3a10f2e9114b",
+      "name": "Transcribe Voice Note",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        32,
+        2624
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "pG6IXZt7By7WBYLf",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "userInput",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "104a1db6-bcd9-4e1d-b57c-fa95f3e8129a",
+      "name": "Prepare Text Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        2816
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "userInput",
+              "value": "={{ $json.text || $json.message?.text }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "chatId",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "3d53378e-4978-43d4-8c79-e845bc1b3ca9",
+      "name": "Merge Input Paths",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        2720
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Merge Input Paths').first().json.chatId }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "id": "b4c22cd7-ed1d-496b-bd10-bfb29d7d497a",
+      "name": "Send Telegram Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1632,
+        2720
+      ],
+      "webhookId": "73131f2a-5f66-4a36-93fa-7c1ce7de40b6",
+      "credentials": {
+        "telegramApi": {
+          "id": "BwQQkWdRYzwTPlKm",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "id": "77e8d2e5-1e6e-44b5-bf7e-eb1867e5a4a8",
+      "name": "OpenAI Model - Agent 1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        496,
+        2032
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "pG6IXZt7By7WBYLf",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "id": "8456569e-1b72-4c84-8bb4-862fc3805ba2",
+      "name": "OpenAI Model - Agent 2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        2432
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "pG6IXZt7By7WBYLf",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "id": "a083d841-44fb-48ca-a28d-c7abbcbdcfd7",
+      "name": "OpenAI Model - Agent 3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        3232
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "pG6IXZt7By7WBYLf",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "id": "96983e4b-1e52-4346-ab26-4ddddc4d78c7",
+      "name": "OpenAI Model - Agent 4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        496,
+        3744
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "pG6IXZt7By7WBYLf",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "id": "1ac5d716-a60f-4113-be05-c8e82f3a65ed",
+      "name": "OpenAI Model - Final Agent",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1360,
+        2944
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "pG6IXZt7By7WBYLf",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are Agent 1. Analyze the following user input and provide your specialized analysis: {{ $json.userInput }}\n\n{{ $json.formatted_analysis }}\n\n# Market Sizing Analysis\n\n## Your Mission\nEvaluate the market opportunity for this startup. Provide a quantitative assessment of addressable market size and growth potential.\n\n## Analysis Framework\n\n**Market Sizing:**\n- TAM (Total Addressable Market): Global opportunity in $B\n- SAM (Serviceable Addressable Market): Realistic target segment in $B  \n- SOM (Serviceable Obtainable Market): Achievable 3-year capture in $M\n- Market penetration assumptions and rationale\n\n**Market Dynamics:**\n- Annual growth rate (% CAGR)\n- Market maturity stage (Early/Growth/Mature)\n- Key growth drivers and tailwinds\n- Market concentration and fragmentation\n\n**Competitive Landscape:**\n- Market share distribution\n- Barriers to entry assessment\n- Substitution threats\n- Adjacent market opportunities\n\n## Scoring Criteria (0-100)\n\n- **90-100**: Massive market ($50B+ TAM), 20%+ growth, early stage\n- **75-89**: Large market ($10-50B TAM), 10-20% growth, good timing\n- **60-74**: Medium market ($2-10B TAM), 5-10% growth, moderate opportunity\n- **40-59**: Small market ($500M-2B TAM), <5% growth, limited upside\n- **Below 40**: Tiny/shrinking market, poor timing, questionable opportunity\n\n## Output Format\n\n**MARKET SCORE: [0-100]**\n\n**MARKET SIZING:**\n- TAM: $X.XB\n- SAM: $X.XB  \n- SOM: $XXM (Year 3)\n- Growth Rate: XX% CAGR\n- Market Stage: [Early/Growth/Mature]\n\n**REASONING:**\n[3-4 sentences explaining your score. Address market size, growth trajectory, timing, and competitive dynamics. Be specific about assumptions.]\n\n**KEY INSIGHTS:**\n- Primary opportunity driver\n- Market timing assessment\n- Competitive intensity\n- Risk factors to market thesis\n you also have access to a calculator tool if you need to use it to solve equations or work out figures ",
+        "options": {
+          "systemMessage": "You are an expert Market Sizing analyst specializing in TAM/SAM/SOM analysis for venture capital. Your role is to assess market opportunities with rigorous, data-driven estimates. You understand market dynamics, growth trajectories, and competitive landscapes. Focus on realistic addressable markets, not aspirational totals. Consider market maturity, penetration rates, and timing. Be skeptical of overly optimistic projections."
+        }
+      },
+      "id": "1473d5a2-b445-47e0-9653-dc9c6c9aba37",
+      "name": "Market Sizing Analyst",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        480,
+        1808
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are Agent 2. Analyze the following user input from your unique perspective: {{ $json.userInput }}\n\n{{ $json.formatted_analysis }}\n\n# Founder Fit & Execution Analysis\n\n## Your Mission\nDetermine execution feasibility. If this is an existing startup, evaluate the team. If this is a business idea, assess what kind of founder/team would be needed to execute it successfully.\n\n## Analysis Framework\n\n### MODE 1: If Existing Startup (Team Exists)\n\n**Team Composition:**\n- Number of founders and key roles\n- Technical vs business skill balance\n- Team completeness and gaps\n\n**Founder Credentials:**\n- Educational background\n- Professional experience (years, companies, roles)\n- Previous startup experience or exits\n- Domain expertise in this industry\n- Relevant technical skills\n\n**Track Record:**\n- Prior company exits (valuations, outcomes)\n- Previous leadership roles\n- Notable achievements\n\n**Execution Indicators:**\n- Speed of progress to date\n- Resourcefulness demonstrated\n- Network and relationships\n\n**Red Flags:**\n- Lack of relevant experience\n- Solo founder without cofounder plans\n- Mismatched skills for business model\n- Team conflicts or instability\n\n---\n\n### MODE 2: If Business Idea (No Team Yet)\n\n**Required Founder Archetype:**\n- Essential skills needed (technical/business/domain)\n- Solo-founder viable or team required?\n- Must-have experience or credentials\n- Nice-to-have but not critical\n\n**Execution Complexity:**\n- Technical difficulty (simple/moderate/hard/extremely hard)\n- Regulatory or compliance requirements\n- Capital intensity before revenue\n- Time to first customer/revenue\n\n**Founder-Idea Fit Assessment:**\nIf you can infer anything about the person pitching:\n- Do they seem to have relevant background?\n- Signals of domain knowledge in the pitch?\n- Realistic understanding of challenges?\n\n**Team Building Requirements:**\n- Critical roles to hire immediately\n- Skills that can be outsourced initially\n- Advisory needs (technical, industry, go-to-market)\n\n**Execution Risks:**\n- Hardest part to execute\n- Most common failure modes for this type of business\n- What would make someone uniquely qualified to build this?\n\n---\n\n## Scoring Criteria (0-100)\n\n### If Existing Startup:\n- **90-100**: Serial successful founders, $100M+ prior exit, domain experts\n- **75-89**: Strong experience, prior exit/IPO, clear domain knowledge\n- **60-74**: Solid experience, some startup background, learning domain\n- **40-59**: Limited experience, first-timers, weak domain fit\n- **Below 40**: Major red flags, poor fit, concerning background\n\n### If Business Idea:\n- **90-100**: Simple execution, solo-founder viable, low technical complexity\n- **75-89**: Moderate complexity, clear path, achievable with small team\n- **60-74**: Challenging but feasible, needs specific expertise\n- **40-59**: Very hard to execute, requires rare skill combo or heavy capital\n- **Below 40**: Nearly impossible, requires world-class team + massive resources\n\n---\n\n## Output Format\n\n**EXECUTION SCORE: [0-100]**\n\n### If Existing Startup:\n**TEAM ASSESSMENT:**\n- Founders: X [names/roles if mentioned]\n- Prior Exits: [Yes/No + details]\n- Domain Expertise: X years\n- Key Strengths: [2-3 points]\n- Concerns: [Any red flags]\n\n**REASONING:**\n[3-4 sentences explaining score. Focus on relevant experience, team composition, and execution capability.]\n\n### If Business Idea:\n**EXECUTION FEASIBILITY:**\n- Complexity Level: [Simple/Moderate/Hard/Extremely Hard]\n- Solo-Founder Viable: [Yes/No]\n- Required Founder Type: [Technical/Business/Domain Expert/Hybrid]\n- Critical Skills Needed: [List 2-3]\n- Team Size Needed: [1/2-3/4+]\n\n**REASONING:**\n[3-4 sentences explaining score. Focus on execution difficulty, required expertise, realistic path to building this.]\n\n---\n\n**KEY INSIGHTS:**\n- [If startup: Why this team can win OR biggest team gap]\n- [If idea: What kind of founder is best positioned to execute this]\n- [Primary execution risk]\n- [Most important next step for team/founder building]",
+        "options": {
+          "systemMessage": "You are a versatile startup evaluator who can assess BOTH existing founding teams AND business idea feasibility for solo ideators. \n\nWhen analyzing existing startups: Focus on founder credentials, track records, domain expertise, and team composition.\n\nWhen analyzing business ideas from individuals: Focus on the SKILL REQUIREMENTS needed to execute the idea, realistic founder archetype needed, and whether this is a solo-founder-friendly or team-required opportunity. Assess execution complexity and what kind of person/team would be best positioned to build this.\n\nBe adaptive - if the pitch mentions a team, evaluate the team. If it's just an idea, evaluate what's needed to execute it."
+        }
+      },
+      "id": "65dc5dda-7da8-469d-b39e-9de945edb00f",
+      "name": "Founder Fit / Idea Feasibility Analyst",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        480,
+        2208
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are Agent 3. Provide your expert analysis on the following user input: {{ $json.userInput }}\n\n{{ $json.formatted_analysis }}\n\n{{ $json.formatted_analysis }}\n\n# Product-Market Fit Analysis\n\n## Your Mission\nAssess whether this startup has achieved product-market fit through objective traction metrics and unit economics.\n\n## Analysis Framework\n\n**Revenue Traction:**\n- Current MRR/ARR and absolute growth\n- Month-over-month or year-over-year growth rate\n- Customer count and average contract value\n- Revenue concentration (top customers %)\n\n**Growth Quality:**\n- Organic vs paid growth split\n- Net retention rate (NRR) or GRR\n- Customer churn rate (logo and revenue)\n- Expansion revenue from existing customers\n- Net Promoter Score (NPS) if available\n\n**Unit Economics:**\n- Customer Acquisition Cost (CAC)\n- Lifetime Value (LTV)\n- LTV:CAC ratio (target 3:1 or better)\n- Payback period (months)\n- Gross margin on product\n\n**Burn Efficiency:**\n- Monthly burn rate\n- Burn multiple = Burn / Net New ARR\n- Magic Number = Net New ARR / Sales & Marketing spend\n- Runway remaining (months)\n\n**PMF Signals:**\n- Strong word-of-mouth and organic growth\n- High retention (>90% net revenue retention)\n- Customers actively referring others\n- Rapid feature adoption and engagement\n- Clear customer pain point validation\n\n## Scoring Criteria (0-100)\n\n- **90-100**: $5M+ ARR, 20%+ MoM, >120% NRR, <1.0 burn multiple, strong organics\n- **75-89**: $1M+ ARR, 10-20% MoM, >100% NRR, 1-2 burn multiple, good retention\n- **60-74**: $200K+ ARR, 5-10% MoM, >90% retention, 2-3 burn multiple, finding PMF\n- **40-59**: Early revenue, slow growth, high churn, poor economics, weak PMF\n- **Below 40**: No real traction, high churn, bad economics, no PMF\n\n## Output Format\n\n**PMF SCORE: [0-100]**\n\n**TRACTION METRICS:**\n- MRR/ARR: $X\n- Growth Rate: X% MoM/YoY\n- Customers: X (avg ACV: $X)\n- Net Retention: X%\n- Churn: X% monthly\n\n**UNIT ECONOMICS:**\n- LTV:CAC Ratio: X:1\n- CAC Payback: X months\n- Burn Multiple: X.X\n- Gross Margin: X%\n\n**REASONING:**\n[3-4 sentences explaining your score. Focus on growth quality, retention strength, economic efficiency, and PMF evidence. Be honest about concerns.]\n\n**KEY INSIGHTS:**\n- Strongest PMF evidence\n- Growth sustainability assessment  \n- Unit economics health\n- Path to profitability timeline",
+        "options": {
+          "systemMessage": "You are an expert Product-Market Fit analyst specializing in traction metrics and unit economics. You assess whether startups have found PMF through quantitative evidence: revenue growth, retention rates, NPS, engagement metrics, and economic efficiency. You understand that vanity metrics (downloads, signups) don't matter - only monetization, retention, and healthy unit economics indicate real PMF. You can distinguish between growth from paid acquisition vs organic word-of-mouth. Be rigorous about burn multiple and path to profitability."
+        }
+      },
+      "id": "f13b1e69-9d1b-4625-a371-d4b968c9bb98",
+      "name": "Product-Market Fit Analyst",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        480,
+        3008
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are Agent 4. Examine the following user input and share your insights: {{ $json.userInput }}\n\n{{ $json.formatted_analysis }}\n\n# Competitive Moat Analysis\n\n## Your Mission\nAssess the defensibility and competitive advantages of this startup using strategic frameworks.\n\n## Analysis Framework - Porter's Five Forces\n\n**1. Threat of New Entry:**\n- Capital requirements to compete\n- Regulatory or licensing barriers\n- Access to distribution channels\n- Economies of scale advantages\n- Network effects and data moats\n\n**2. Supplier Power:**\n- Concentration of suppliers\n- Switching costs to alternative suppliers\n- Forward integration threats\n- Importance to supplier's business\n\n**3. Buyer Power:**\n- Customer concentration risk\n- Price sensitivity and negotiation leverage\n- Backward integration threats\n- Switching costs for customers\n\n**4. Threat of Substitutes:**\n- Alternative solutions available\n- Price-performance of substitutes\n- Switching costs from substitutes\n- Customer propensity to substitute\n\n**5. Competitive Rivalry:**\n- Number and strength of competitors\n- Market growth rate and dynamics\n- Differentiation and switching costs\n- Exit barriers and industry consolidation\n\n## Moat Assessment\n\n**Network Effects:**\n- Direct (more users → more value)\n- Indirect (platform with complementary sides)\n- Data network effects (more usage → better product)\n- Strength: None/Weak/Moderate/Strong\n\n**Switching Costs:**\n- Contractual lock-in\n- Data migration complexity\n- Integration depth\n- Learning curve and habit formation\n- Assessment: Low/Medium/High\n\n**Proprietary Advantages:**\n- Patented technology or trade secrets\n- Exclusive data or content\n- Regulatory approvals or licenses\n- Brand recognition and trust\n\n**Scale Advantages:**\n- Economies of scale in unit economics\n- Fixed cost leverage\n- Two-sided marketplace dynamics\n- Distribution or supply chain advantages\n\n## Scoring Criteria (0-100)\n\n- **90-100**: Multiple strong moats (network effects + IP + scale), very defensible\n- **75-89**: Clear moat (strong network effects or high switching costs), defensible\n- **60-74**: Moderate defensibility (some barriers, building moat), competitive\n- **40-59**: Weak moat (easily replicable, low barriers), commoditization risk\n- **Below 40**: No moat (pure execution play), highly vulnerable\n\n## Output Format\n\n**MOAT SCORE: [0-100]**\n\n**DEFENSIBILITY ASSESSMENT:**\n- Entry Barriers: [High/Medium/Low]\n- Network Effects: [Strong/Moderate/Weak/None]\n- Switching Costs: [High/Medium/Low]\n- IP/Tech Moat: [Yes/No + details]\n\n**PORTER'S FIVE FORCES:**\n- New Entry Threat: [Analysis]\n- Supplier Power: [Analysis]\n- Buyer Power: [Analysis]\n- Substitutes: [Analysis]\n- Rivalry: [Analysis]\n\n**REASONING:**\n[3-4 sentences explaining your score. Focus on the strongest and weakest forces. Be realistic about moat strength and development timeline.]\n\n**KEY INSIGHTS:**\n- Primary competitive advantage\n- Moat development trajectory\n- Most vulnerable competitive dimension\n- Strategic moves to strengthen position\n\nyou also have access to a calculator tool if you need to use it to solve equations or work out figures ",
+        "options": {
+          "systemMessage": "You are an expert Valuation specialist for venture capital with deep knowledge of comparable company analysis, revenue multiples, and stage-appropriate valuation frameworks. You understand that early-stage valuations are more art than science, driven by market comps, growth rates, TAM size, competitive dynamics, and supply/demand for deals. You can assess whether a valuation is reasonable vs inflated. You think in terms of ownership targets (15-25% for Series A), expected returns (3-5x minimum, 10x+ home runs), and portfolio construction. Be honest about overpricing."
+        }
+      },
+      "id": "ad2b9a19-af3e-4afe-83be-a9d4d7cdd600",
+      "name": "Competitive Moat Analyst1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        480,
+        2608
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format all 5 analyst outputs for the synthesis agent\nconst items = $input.all();\n\nlet summary = \"# INVESTMENT COMMITTEE ANALYST REPORTS\\n\\n\";\n\nconst analysts = [\n  \"Market Sizing Analyst\",\n  \"Founder Fit Analyst\", \n  \"Product-Market Fit Analyst\",\n  \"Competitive Moat Analyst\",\n  \"Valuation Analyst\"\n];\n\nfor (let i = 0; i < items.length && i < 5; i++) {\n  summary += `## ${analysts[i]}\\n\\n`;\n  \n  // Handle the nested output structure\n  let output = 'No output';\n  \n  if (items[i].json.output && Array.isArray(items[i].json.output)) {\n    // Output is an array with nested objects\n    output = items[i].json.output[0]?.output || \n             items[i].json.output[0]?.text ||\n             JSON.stringify(items[i].json.output[0]);\n  } else if (items[i].json.output) {\n    // Output is directly available\n    output = items[i].json.output;\n  } else if (items[i].json.text) {\n    output = items[i].json.text;\n  }\n  \n  summary += `**Analysis Output:**\\n${output}\\n\\n`;\n  summary += \"─\".repeat(60) + \"\\n\\n\";\n}\n\nsummary += `\\n**Total Analysts Reporting:** ${items.length}\\n`;\n\n// Try to get chatId from items if available\nlet chatId = null;\nif (items.length > 0) {\n  chatId = items[0].json.chatId || null;\n}\n\nreturn {\n  json: {\n    committee_summary: summary,\n    analyst_count: items.length,\n    chatId: chatId\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        2720
+      ],
+      "id": "b2c01092-ac8d-4dac-a3a5-c7c4392a8317",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=ANALYST COMMITTEE RECOMMENDATIONS:\n\n{{ $json.committee_summary }}\n\n---\n\n# Investment Committee Chair - Final Decision\n\n## Your Mission\nReview the 5 analyst recommendations above and synthesize them into a final investment decision with clear rationale and next steps.\n\n## Analysis Framework\n\n**Consensus Assessment:**\n- Which analysts are aligned in their recommendations?\n- What's the average score across all 5 dimensions?\n- Where is there strong agreement vs disagreement?\n- Are there any blocking concerns (red flags)?\n\n**Score Weighting by Stage:**\nFor pre-seed/seed (idea stage):\n- Market (30%) + Founder Fit (30%) > PMF (20%) + Moat (10%) + Valuation (10%)\n\nFor Series A (traction stage):\n- PMF (35%) + Market (25%) > Valuation (20%) + Moat (15%) + Founder (5%)\n\nFor Series B+ (scaling stage):\n- Moat (30%) + PMF (30%) > Valuation (25%) + Market (10%) + Founder (5%)\n\n**Decision Factors:**\n- Is the overall score above 70? (Strong signal)\n- Are there any scores below 40? (Red flags)\n- Do the strengths outweigh the weaknesses?\n- What's the realistic upside scenario?\n- What could go catastrophically wrong?\n\n**Investor Psychology:**\n- Does this feel like FOMO or genuine opportunity?\n- Would we regret passing if it becomes huge?\n- Would we regret investing if it fails?\n- Is this actually interesting or just trendy?\n\n---\n\n## Output Format\n\n**INVESTMENT DECISION: [STRONG YES / YES / MAYBE / NO / STRONG NO]**\n\n**FINAL SCORE: [0-100]** (Your synthesized score, not just average)\n\n**DECISION RATIONALE:**\n[3-4 sentences explaining your final decision. Be direct about why this is/isn't investable. Reference specific analyst insights that drove your decision.]\n\n**COMMITTEE CONSENSUS:**\n- Aligned Analysts: [Which ones agree?]\n- Dissenting Views: [Any contrarian takes?]\n- Strongest Signal: [Most compelling reason to invest]\n- Biggest Risk: [Most concerning factor]\n\n**NEXT STEPS:**\n\nIf YES/STRONG YES:\n- Immediate Actions: [What to do next - meeting, data room, references]\n- Due Diligence Focus: [Top 3 things to verify]\n- Deal Terms Framework: [Rough valuation, ownership target, stage]\n- Timeline: [Expected decision timeframe]\n\nIf MAYBE:\n- Information Needed: [What would change this to YES]\n- Follow-up Questions: [Specific questions for founder]\n- Monitoring Plan: [Check back in X months if...]\n\nIf NO/STRONG NO:\n- Primary Reason: [Why passing]\n- Feedback for Founder: [Constructive advice if they asked]\n- Reconsider If: [What would need to change]\n\n---\n\n**INVESTMENT COMMITTEE CHAIR GUIDANCE:**\n\n\"[Your final 2-3 sentence guidance to the team. Be decisive. If YES, explain the conviction. If NO, be respectful but clear. If MAYBE, specify exactly what needs to happen next.]\"\n{{ $json.data }}",
+        "options": {
+          "systemMessage": "You are the Investment Committee Chair synthesizing recommendations from 5 specialized VC analysts into a final investment decision. Your role is to:\n\n1. Identify consensus and dissent among analysts\n2. Weight scores appropriately based on stage and context\n3. Make the final GO/NO-GO investment recommendation\n4. Set clear next steps and due diligence requirements\n5. Provide actionable guidance to the entrepreneur\n\nBalance enthusiasm with skepticism. A perfect score isn't needed - 70+ with strong team and market is often enough. Be decisive but fair. Remember that VCs invest in 1-2% of opportunities they see."
+        }
+      },
+      "id": "2f0cf05d-accd-4f83-a1a6-2e36ec03c2e4",
+      "name": "Investment Committee Chair",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        2720
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        496,
+        2832
+      ],
+      "id": "7c1ad65f-879b-40ba-bc0f-611a36fe9db1",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "pG6IXZt7By7WBYLf",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {
+          "mimeType": ""
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -192,
+        2624
+      ],
+      "id": "6a6c6002-fd9f-42ec-a09b-65efb5e69961",
+      "name": "Get a file",
+      "webhookId": "a09ea286-4fb8-4c44-a7b3-49827095c8df",
+      "credentials": {
+        "telegramApi": {
+          "id": "BwQQkWdRYzwTPlKm",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        624,
+        2032
+      ],
+      "id": "9731b540-76b4-4341-bca9-853147e5a3d3",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        624,
+        2832
+      ],
+      "id": "7bd684d6-3506-4711-a834-abf6ac500c05",
+      "name": "Calculator1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        624,
+        3744
+      ],
+      "id": "159268b8-546c-4e9c-8788-c3b48ef7bf49",
+      "name": "Calculator2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are Agent 4. Examine the following user input and share your insights: {{ $json.userInput }}\n\n={{ $json.userInput }}\n\n{{ $json.formatted_analysis }}\n\n# Valuation Analysis\n\n## Your Mission\nAssess whether the valuation is reasonable and evaluate return potential using comparable analysis.\n\n## Analysis Framework\n\n**Stage-Appropriate Benchmarks:**\n- Pre-seed: $2-5M valuation, pre-product\n- Seed: $5-15M valuation, product launched, early traction\n- Series A: $15-50M valuation, $1-3M ARR, PMF validated\n- Series B: $50-150M valuation, $5-15M ARR, scaling\n- Series C+: $150M+ valuation, $15M+ ARR, growth stage\n\n**Revenue Multiple Analysis:**\n- Current or projected ARR\n- Implied valuation / ARR multiple\n- Compare to public comps (SaaS: 5-15x ARR typical)\n- Adjust for growth rate, margins, market position\n- Private market discount (20-40% below public)\n\n**Comparable Company Analysis:**\n- Similar business models and industries\n- Recent funding rounds at similar stage\n- Relevant M&A transactions\n- Public company trading multiples (adjusted)\n- Geographic and market considerations\n\n**Deal Structure:**\n- Proposed raise amount and post-money valuation\n- Implied investor ownership %\n- Pro rata rights and follow-on reserve needs\n- Liquidation preference and terms\n- Option pool size and dilution\n\n**Return Potential:**\n- Exit scenario modeling (M&A vs IPO)\n- Required revenue at exit for target multiple\n- Years to exit and IRR implications\n- Probability-weighted expected return\n- Risk-adjusted return profile\n\n## Scoring Criteria (0-100)\n\n- **90-100**: Below market valuation, exceptional return potential (10x+), clear path\n- **75-89**: Fair valuation, strong return potential (5-10x), favorable terms\n- **60-74**: Market valuation, reasonable returns (3-5x), acceptable risk/reward\n- **40-59**: Stretched valuation, marginal returns (2-3x), needs perfect execution\n- **Below 40**: Overpriced, poor returns (<2x), high risk of down round\n\n## Output Format\n\n**VALUATION SCORE: [0-100]**\n\n**VALUATION ANALYSIS:**\n- Current/Asking Valuation: $XM\n- Current ARR: $X (if applicable)\n- Implied Revenue Multiple: Xx ARR\n- Comparable Range: $XM-$YM\n- Assessment: [Undervalued/Fair/Overvalued]\n\n**COMPARABLE COMPANIES:**\n- Comp 1: [Company, valuation, multiple]\n- Comp 2: [Company, valuation, multiple]\n- Comp 3: [Company, valuation, multiple]\n- Market Average: Xx revenue multiple\n\n**RETURN MODELING:**\n- Target Ownership: X%\n- Exit Valuation Estimate: $XM-$YM (Year 5-7)\n- Projected Multiple: X.Xx\n- Risk-Adjusted IRR: X%\n\n**REASONING:**\n[3-4 sentences explaining your score. Compare to market comps, assess return potential, evaluate risk/reward. Be direct about overpricing concerns.]\n\n**KEY INSIGHTS:**\n- Valuation vs market positioning\n- Return potential assessment\n- Deal structure considerations\n- Key risks to valuation thesis\n\nYou have access to a calculator tool if you need to use it to solve equations or work out figures.",
+        "options": {
+          "systemMessage": "You are an expert Valuation specialist for venture capital with deep knowledge of comparable company analysis, revenue multiples, and stage-appropriate valuation frameworks. You understand that early-stage valuations are more art than science, driven by market comps, growth rates, TAM size, competitive dynamics, and supply/demand for deals. You can assess whether a valuation is reasonable vs inflated. You think in terms of ownership targets (15-25% for Series A), expected returns (3-5x minimum, 10x+ home runs), and portfolio construction. Be honest about overpricing."
+        }
+      },
+      "id": "65f42139-05cf-494e-8333-f5af4a0f5cef",
+      "name": "Valuation Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        480,
+        3520
+      ]
+    },
+    {
+      "parameters": {
+        "numberInputs": 5
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        832,
+        2672
+      ],
+      "id": "58c29c9e-035a-423a-a79c-09c4726498f0",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Message Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Message Type": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Text Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe Voice Note": {
+      "main": [
+        [
+          {
+            "node": "Merge Input Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Text Input": {
+      "main": [
+        [
+          {
+            "node": "Merge Input Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Input Paths": {
+      "main": [
+        [
+          {
+            "node": "Market Sizing Analyst",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Founder Fit / Idea Feasibility Analyst",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Competitive Moat Analyst1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Product-Market Fit Analyst",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Valuation Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - Agent 1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Market Sizing Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - Agent 2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Founder Fit / Idea Feasibility Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - Agent 3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Product-Market Fit Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - Agent 4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Valuation Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - Final Agent": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Investment Committee Chair",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Market Sizing Analyst": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Founder Fit / Idea Feasibility Analyst": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product-Market Fit Analyst": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Investment Committee Chair",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Competitive Moat Analyst1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe Voice Note",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "Market Sizing Analyst",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Competitive Moat Analyst1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Valuation Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Investment Committee Chair": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitive Moat Analyst1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Valuation Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "aeac65e2-4b0d-4adc-9180-dd5b7674c418",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bda284ba69a5bf5f0d731ca0a44a60340df82eff9ee04a27b6a86d364a4b86e3"
+  },
+  "id": "CRRoBZ5FGpUi7kd3",
+  "tags": []
+}
