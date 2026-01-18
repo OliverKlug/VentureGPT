@@ -325,4 +325,4 @@ Contributions welcome! Areas for improvement:
 
 ---
 
-<p align="center"> <sub>Built with n8n + OpenAI | README created with AI assistance</sub> </p>
+<p align="center"> <sub>Built with n8n + AI + Inspiration from creators | README created with AI assistance</sub> </p>
